@@ -35,7 +35,7 @@ export async function createUser(formData: FormData) {
     const phone = formData.get('phone') as string
 
     if (!name || !email || !password || !role) {
-        return { error: 'Missing fields' }
+        throw new Error('Missing fields')
     }
 
     try {
@@ -51,9 +51,8 @@ export async function createUser(formData: FormData) {
             },
         })
         revalidatePath('/dashboard/admin')
-        return { success: true }
     } catch (error) {
-        return { error: 'Failed to create user' }
+        throw new Error('Failed to create user')
     }
 }
 
@@ -63,9 +62,8 @@ export async function deleteUser(id: string) {
     try {
         await prisma.user.delete({ where: { id } })
         revalidatePath('/dashboard/admin')
-        return { success: true }
     } catch (error) {
-        return { error: 'Failed to delete user' }
+        throw new Error('Failed to delete user')
     }
 }
 
@@ -76,7 +74,7 @@ export async function updatePassword(formData: FormData) {
     const password = formData.get('password') as string
 
     if (!id || !password) {
-        return { error: 'Missing fields' }
+        throw new Error('Missing fields')
     }
 
     try {
@@ -86,9 +84,8 @@ export async function updatePassword(formData: FormData) {
             data: { password: hashedPassword },
         })
         revalidatePath('/dashboard/admin')
-        return { success: true }
     } catch (error) {
-        return { error: 'Failed to update password' }
+        throw new Error('Failed to update password')
     }
 }
 
@@ -103,7 +100,7 @@ export async function updateUser(formData: FormData) {
     const phone = formData.get('phone') as string
 
     if (!id || !name || !email || !role) {
-        return { error: 'Missing fields' }
+        throw new Error('Missing fields')
     }
 
     try {
@@ -118,10 +115,9 @@ export async function updateUser(formData: FormData) {
             },
         })
         revalidatePath('/dashboard/admin')
-        return { success: true }
     } catch (error) {
         console.error('Update user error:', error)
-        return { error: `Failed to update user: ${(error as Error).message}` }
+        throw new Error(`Failed to update user: ${(error as Error).message}`)
     }
 }
 

@@ -28,7 +28,7 @@ export async function getMasters() {
 export async function submitAttendance(formData: FormData) {
     const session = await getServerSession(authOptions)
     if (!session || !session.user) {
-        return { error: 'Unauthorized' }
+        throw new Error( 'Unauthorized' }
     }
 
     const date = formData.get('date') as string
@@ -37,7 +37,7 @@ export async function submitAttendance(formData: FormData) {
     const masterId = formData.get('masterId') as string
 
     if (!date || !location || !activityId || !masterId) {
-        return { error: 'Missing fields' }
+        throw new Error( 'Missing fields' }
     }
 
     try {
@@ -79,10 +79,10 @@ export async function submitAttendance(formData: FormData) {
         }
 
         revalidatePath('/dashboard')
-        return { success: true }
+        // Success
     } catch (error) {
         console.error(error)
-        return { error: 'Failed to submit attendance' }
+        throw new Error( 'Failed to submit attendance' }
     }
 }
 
@@ -115,7 +115,7 @@ export async function getPendingAttendance() {
 
 export async function approveAttendance(id: string) {
     const session = await getServerSession(authOptions)
-    if (!session || !session.user) return { error: 'Unauthorized' }
+    if (!session || !session.user) throw new Error( 'Unauthorized' }
 
     try {
         await prisma.attendance.update({
@@ -123,15 +123,15 @@ export async function approveAttendance(id: string) {
             data: { status: 'APPROVED' },
         })
         revalidatePath('/dashboard')
-        return { success: true }
+        // Success
     } catch (error) {
-        return { error: 'Failed to approve' }
+        throw new Error( 'Failed to approve' }
     }
 }
 
 export async function deleteAttendance(id: string) {
     const session = await getServerSession(authOptions)
-    if (!session || !session.user) return { error: 'Unauthorized' }
+    if (!session || !session.user) throw new Error( 'Unauthorized' }
 
     try {
         // Verify the attendance belongs to the current user and is pending
@@ -141,26 +141,26 @@ export async function deleteAttendance(id: string) {
 
         // @ts-ignore
         if (!attendance || attendance.apprenticeId !== session.user.id) {
-            return { error: 'Unauthorized' }
+            throw new Error( 'Unauthorized' }
         }
 
         if (attendance.status !== 'PENDING') {
-            return { error: 'Cannot delete approved/rejected attendance' }
+            throw new Error( 'Cannot delete approved/rejected attendance' }
         }
 
         await prisma.attendance.delete({
             where: { id },
         })
         revalidatePath('/dashboard')
-        return { success: true }
+        // Success
     } catch (error) {
-        return { error: 'Failed to delete attendance' }
+        throw new Error( 'Failed to delete attendance' }
     }
 }
 
 export async function updateAttendance(formData: FormData) {
     const session = await getServerSession(authOptions)
-    if (!session || !session.user) return { error: 'Unauthorized' }
+    if (!session || !session.user) throw new Error( 'Unauthorized' }
 
     const id = formData.get('id') as string
     const date = formData.get('date') as string
@@ -169,7 +169,7 @@ export async function updateAttendance(formData: FormData) {
     const masterId = formData.get('masterId') as string
 
     if (!id || !date || !location || !activityId || !masterId) {
-        return { error: 'Missing fields' }
+        throw new Error( 'Missing fields' }
     }
 
     try {
@@ -180,11 +180,11 @@ export async function updateAttendance(formData: FormData) {
 
         // @ts-ignore
         if (!attendance || attendance.apprenticeId !== session.user.id) {
-            return { error: 'Unauthorized' }
+            throw new Error( 'Unauthorized' }
         }
 
         if (attendance.status !== 'PENDING') {
-            return { error: 'Cannot edit approved/rejected attendance' }
+            throw new Error( 'Cannot edit approved/rejected attendance' }
         }
 
         await prisma.attendance.update({
@@ -197,10 +197,10 @@ export async function updateAttendance(formData: FormData) {
             },
         })
         revalidatePath('/dashboard')
-        return { success: true }
+        // Success
     } catch (error) {
         console.error(error)
-        return { error: 'Failed to update attendance' }
+        throw new Error( 'Failed to update attendance' }
     }
 }
 
@@ -243,14 +243,14 @@ export async function getCurrentUser() {
 export async function updateOwnProfile(formData: FormData) {
     const session = await getServerSession(authOptions)
     if (!session || !session.user) {
-        return { error: 'Unauthorized' }
+        throw new Error( 'Unauthorized' }
     }
 
     const email = formData.get('email') as string
     const phone = formData.get('phone') as string
 
     if (!email) {
-        return { error: 'Email is required' }
+        throw new Error( 'Email is required' }
     }
 
     try {
@@ -264,16 +264,16 @@ export async function updateOwnProfile(formData: FormData) {
             },
         })
         revalidatePath('/dashboard/profile')
-        return { success: true }
+        // Success
     } catch (error) {
-        return { error: 'Failed to update profile' }
+        throw new Error( 'Failed to update profile' }
     }
 }
 
 export async function updateOwnPassword(formData: FormData) {
     const session = await getServerSession(authOptions)
     if (!session || !session.user) {
-        return { error: 'Unauthorized' }
+        throw new Error( 'Unauthorized' }
     }
 
     const currentPassword = formData.get('currentPassword') as string
@@ -281,15 +281,15 @@ export async function updateOwnPassword(formData: FormData) {
     const confirmPassword = formData.get('confirmPassword') as string
 
     if (!currentPassword || !newPassword || !confirmPassword) {
-        return { error: 'All fields are required' }
+        throw new Error( 'All fields are required' }
     }
 
     if (newPassword !== confirmPassword) {
-        return { error: 'New passwords do not match' }
+        throw new Error( 'New passwords do not match' }
     }
 
     if (newPassword.length < 6) {
-        return { error: 'Password must be at least 6 characters' }
+        throw new Error( 'Password must be at least 6 characters' }
     }
 
     try {
@@ -300,12 +300,12 @@ export async function updateOwnPassword(formData: FormData) {
         })
 
         if (!user) {
-            return { error: 'User not found' }
+            throw new Error( 'User not found' }
         }
 
         const isValid = await compare(currentPassword, user.password)
         if (!isValid) {
-            return { error: 'Current password is incorrect' }
+            throw new Error( 'Current password is incorrect' }
         }
 
         const hashedPassword = await hash(newPassword, 12)
@@ -316,16 +316,16 @@ export async function updateOwnPassword(formData: FormData) {
         })
 
         revalidatePath('/dashboard/profile')
-        return { success: true }
+        // Success
     } catch (error) {
-        return { error: 'Failed to update password' }
+        throw new Error( 'Failed to update password' }
     }
 }
 
 export async function resendApprovalRequest(attendanceId: string) {
     const session = await getServerSession(authOptions)
     if (!session || !session.user) {
-        return { error: 'Unauthorized' }
+        throw new Error( 'Unauthorized' }
     }
 
     try {
@@ -339,16 +339,16 @@ export async function resendApprovalRequest(attendanceId: string) {
         })
 
         if (!attendance) {
-            return { error: 'Attendance not found' }
+            throw new Error( 'Attendance not found' }
         }
 
         // @ts-ignore
         if (attendance.apprenticeId !== session.user.id) {
-            return { error: 'Unauthorized' }
+            throw new Error( 'Unauthorized' }
         }
 
         if (attendance.status !== 'PENDING') {
-            return { error: 'Can only resend for pending approvals' }
+            throw new Error( 'Can only resend for pending approvals' }
         }
 
         // Send email notification to master
@@ -364,9 +364,9 @@ export async function resendApprovalRequest(attendanceId: string) {
             )
         }
 
-        return { success: true }
+        // Success
     } catch (error) {
         console.error(error)
-        return { error: 'Failed to resend notification' }
+        throw new Error( 'Failed to resend notification' }
     }
 }

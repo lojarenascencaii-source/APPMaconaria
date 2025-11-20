@@ -354,6 +354,19 @@ export async function resendApprovalRequest(attendanceId: string) {
             return { error: 'Can only resend for pending approvals' }
         }
 
+        // Generate new approval token
+        const approvalToken = crypto.randomBytes(32).toString('hex')
+        const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+
+        // Update attendance with new token
+        await prisma.attendance.update({
+            where: { id: attendanceId },
+            data: {
+                approvalToken,
+                tokenExpiry,
+            },
+        })
+
         // Send email notification to master
         if (attendance.master.email) {
             await sendApprovalNotification(
@@ -363,7 +376,8 @@ export async function resendApprovalRequest(attendanceId: string) {
                 attendance.activity.name,
                 new Date(attendance.date).toLocaleDateString('pt-BR', { timeZone: 'UTC' }),
                 attendance.location,
-                attendance.id
+                attendance.id,
+                approvalToken
             )
         }
 

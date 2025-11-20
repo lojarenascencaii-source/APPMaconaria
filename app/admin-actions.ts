@@ -56,13 +56,53 @@ export async function createUser(formData: FormData) {
     }
 }
 
+export async function getUserDependencies(id: string) {
+    await checkAdmin()
+
+    const user = await prisma.user.findUnique({
+        where: { id },
+        include: {
+            _count: {
+                select: {
+                    attendancesAsApprentice: true,
+                    attendancesAsMaster: true,
+                }
+            }
+        }
+    })
+
+    if (!user) throw new Error('User not found')
+
+    return {
+        asApprentice: user._count.attendancesAsApprentice,
+        asMaster: user._count.attendancesAsMaster
+    }
+}
+
 export async function deleteUser(id: string) {
     await checkAdmin()
 
     try {
-        await prisma.user.delete({ where: { id } })
+        await prisma.$transaction(async (tx) => {
+            // Delete all attendances where user is apprentice
+            await tx.attendance.deleteMany({
+                where: { apprenticeId: id }
+            })
+
+            // Delete all attendances where user is master
+            await tx.attendance.deleteMany({
+                where: { masterId: id }
+            })
+
+            // Finally delete the user
+            await tx.user.delete({
+                where: { id }
+            })
+        })
+
         revalidatePath('/dashboard/admin')
     } catch (error) {
+        console.error('Delete user error:', error)
         throw new Error('Failed to delete user')
     }
 }

@@ -1,0 +1,247 @@
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { redirect } from 'next/navigation'
+import { getActivities, getMasters, getApprenticeAttendance, getPendingAttendance, getApprovedAttendance, submitAttendance, approveAttendance } from '@/app/actions'
+import { getUsersProgress, getAdminPendingAttendance, getAdminApprovedAttendance } from '@/app/admin-actions'
+import { LogOut } from 'lucide-react'
+import Link from 'next/link'
+import ProgressDashboard from './admin/progress-dashboard'
+import PersonalProgress from './personal-progress'
+import AttendanceTable from './attendance-table'
+import ApprovedAttendanceTable from './approved-attendance-table'
+
+export default async function Dashboard() {
+    const session = await getServerSession(authOptions)
+
+    if (!session) {
+        redirect('/login')
+    }
+
+    const isApprentice = session.user.role === 'APPRENTICE'
+    const isFellowcraft = session.user.role === 'FELLOWCRAFT'
+    const isMaster = session.user.role === 'MASTER'
+
+    return (
+        <div className="min-h-screen bg-slate-950 text-slate-100">
+            <nav className="bg-slate-900 border-b border-slate-800 p-4">
+                <div className="container mx-auto flex justify-between items-center">
+                    <h1 className="text-xl font-bold text-amber-500">Controle de Presença</h1>
+                    <div className="flex items-center gap-4">
+                        <span className="text-slate-300">Olá, {session.user.name}</span>
+                        {session.user.role === 'ADMIN' && (
+                            <>
+                                <Link
+                                    href="/dashboard/admin"
+                                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors"
+                                >
+                                    Administração
+                                </Link>
+                                <Link
+                                    href="/dashboard/approvals"
+                                    className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-lg transition-colors"
+                                >
+                                    Minhas Aprovações
+                                </Link>
+                            </>
+                        )}
+                        {(session.user.role === 'MASTER' || session.user.role === 'FELLOWCRAFT' || session.user.role === 'APPRENTICE') && (
+                            <Link
+                                href="/dashboard/profile"
+                                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                            >
+                                Meus Dados
+                            </Link>
+                        )}
+                        <Link
+                            href="/api/auth/signout"
+                            className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition-colors"
+                        >
+                            <LogOut className="w-5 h-5" />
+                        </Link>
+                    </div>
+                </div>
+            </nav>
+
+            <main className="container mx-auto p-4 py-8">
+                {isApprentice && <ApprenticeView />}
+                {isFellowcraft && <FellowcraftView />}
+                {isMaster && <MasterView />}
+                {session.user.role === 'ADMIN' && <AdminView />}
+            </main>
+        </div>
+    )
+}
+
+async function ApprenticeView() {
+    const activities = await getActivities()
+    const masters = await getMasters()
+    const history = await getApprenticeAttendance()
+    const approvedAttendances = history.filter((item: any) => item.status === 'APPROVED')
+
+    return (
+        <div className="space-y-8">
+            <PersonalProgress attendances={approvedAttendances} />
+            <section className="bg-slate-900 p-6 rounded-xl border border-slate-800">
+                <h2 className="text-2xl font-semibold text-amber-500 mb-6">Registrar Presença</h2>
+                <form action={submitAttendance} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-slate-400 mb-1">Data</label>
+                            <input type="date" name="date" required className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none" />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-slate-400 mb-1">Local (Loja e Oriente)</label>
+                            <input type="text" name="location" required placeholder="Ex: Loja Esperança, Oriente de SP" className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none" />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-slate-400 mb-1">Atividade</label>
+                            <select name="activityId" required className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none">
+                                <option value="">Selecione...</option>
+                                {activities.map(a => (
+                                    <option key={a.id} value={a.id}>{a.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-slate-400 mb-1">Mestre Responsável</label>
+                            <select name="masterId" required className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none">
+                                <option value="">Selecione...</option>
+                                {masters.map(m => (
+                                    <option key={m.id} value={m.id}>{m.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" className="px-6 py-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg transition-colors">
+                        Enviar Registro
+                    </button>
+                </form>
+            </section>
+
+            <section>
+                <h2 className="text-2xl font-semibold text-slate-200 mb-4">Minhas Presenças</h2>
+                <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
+                    <AttendanceTable history={history} activities={activities} masters={masters} />
+                </div>
+            </section>
+        </div>
+    )
+}
+
+async function FellowcraftView() {
+    const allActivities = await getActivities()
+    // Filter out activities not allowed for Fellowcraft
+    const excludedActivities = ['4ª Instrução', '5ª Instrução', 'Telhamento']
+    const activities = allActivities.filter((a: any) => !excludedActivities.includes(a.name))
+
+    const masters = await getMasters()
+    const history = await getApprenticeAttendance()
+    const approvedAttendances = history.filter((item: any) => item.status === 'APPROVED')
+
+    return (
+        <div className="space-y-8">
+            <PersonalProgress
+                attendances={approvedAttendances}
+                excludedActivities={['Telhamento', '4ª Instrução', '5ª Instrução']}
+            />
+            <section className="bg-slate-900 p-6 rounded-xl border border-slate-800">
+                <h2 className="text-2xl font-semibold text-amber-500 mb-6">Registrar Presença</h2>
+                <form action={submitAttendance} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-slate-400 mb-1">Data</label>
+                            <input type="date" name="date" required className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none" />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-slate-400 mb-1">Local (Loja e Oriente)</label>
+                            <input type="text" name="location" required placeholder="Ex: Loja Esperança, Oriente de SP" className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none" />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-slate-400 mb-1">Atividade</label>
+                            <select name="activityId" required className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none">
+                                <option value="">Selecione...</option>
+                                {activities.map((a: any) => (
+                                    <option key={a.id} value={a.id}>{a.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-slate-400 mb-1">Mestre Responsável</label>
+                            <select name="masterId" required className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none">
+                                <option value="">Selecione...</option>
+                                {masters.map((m: any) => (
+                                    <option key={m.id} value={m.id}>{m.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" className="px-6 py-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg transition-colors">
+                        Enviar Registro
+                    </button>
+                </form>
+            </section>
+
+            <section>
+                <h2 className="text-2xl font-semibold text-slate-200 mb-4">Minhas Presenças</h2>
+                <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
+                    <AttendanceTable history={history} activities={activities} masters={masters} />
+                </div>
+            </section>
+        </div>
+    )
+}
+
+async function MasterView() {
+    const pending = await getPendingAttendance()
+    const approved = await getApprovedAttendance()
+
+    return (
+        <div className="space-y-8">
+            <section>
+                <h2 className="text-2xl font-semibold text-amber-500 mb-4">Aprovações Pendentes</h2>
+                <div className="grid gap-4">
+                    {pending.map((item: any) => (
+                        <div key={item.id} className="bg-slate-900 p-6 rounded-xl border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                            <div>
+                                <h3 className="font-semibold text-lg text-slate-200">{item.apprentice.name}</h3>
+                                <p className="text-slate-400 text-sm">
+                                    {item.activity.name} • {new Date(item.date).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}
+                                </p>
+                                <p className="text-slate-500 text-sm mt-1">{item.location}</p>
+                            </div>
+                            <div className="flex gap-2">
+                                <form action={approveAttendance.bind(null, item.id)}>
+                                    <button className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors">
+                                        Atestar Presença
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    ))}
+                    {pending.length === 0 && (
+                        <div className="p-8 text-center text-slate-500 bg-slate-900 rounded-xl border border-slate-800">
+                            Nenhuma solicitação pendente.
+                        </div>
+                    )}
+                </div>
+            </section>
+
+            <section>
+                <h2 className="text-2xl font-semibold text-green-400 mb-4">Presenças Aprovadas</h2>
+                <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
+                    <ApprovedAttendanceTable approved={approved} />
+                </div>
+            </section>
+        </div>
+    )
+}
+
+async function AdminView() {
+    const usersProgress = await getUsersProgress()
+
+    return (
+        <div className="space-y-8">
+            <ProgressDashboard users={usersProgress} />
+        </div>
+    )
+}

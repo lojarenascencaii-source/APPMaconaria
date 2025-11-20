@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   // "APPRENTICE", "MASTER", "ADMIN"
+  level     String?  // "APPRENTICE", "FELLOWCRAFT", "MASTER"
+  initiationDate DateTime?
+  phone     String?
+  resetToken String?
+  resetTokenExpiry DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  attendancesAsApprentice Attendance[] @relation("ApprenticeAttendances")
+  attendancesAsMaster     Attendance[] @relation("MasterAttendances")
+}
+
+model Activity {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  attendances Attendance[]
+}
+
+model Attendance {
+  id           String   @id @default(cuid())
+  date         DateTime
+  location     String
+  status       String   @default("PENDING") // "PENDING", "APPROVED", "REJECTED"
+  
+  // Relations
+  activityId   String
+  apprenticeId String
+  masterId     String
+  approvalToken String?  @unique // Token for one-click email approval
+  tokenExpiry   DateTime? // Token expiration date
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  activity     Activity @relation(fields: [activityId], references: [id])
+
+  apprentice   User     @relation("ApprenticeAttendances", fields: [apprenticeId], references: [id])
+
+  master       User     @relation("MasterAttendances", fields: [masterId], references: [id])
+}
+
+model EmailConfig {
+  id        String   @id @default(cuid())
+  host      String   // SMTP host (e.g., smtp.gmail.com)
+  port      Int      // SMTP port (e.g., 587, 465)
+  secure    Boolean  // Use TLS/SSL
+  user      String   // SMTP username/email
+  password  String   // Encrypted SMTP password
+  fromEmail String   // From email address
+  fromName  String   // From name
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

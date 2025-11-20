@@ -72,7 +72,7 @@ export async function saveEmailConfig(formData: FormData) {
     const fromName = formData.get('fromName') as string
 
     if (!host || !port || !user || !password || !fromEmail || !fromName) {
-        return { error: 'All fields are required' }
+        throw new Error('All fields are required')
     }
 
     try {
@@ -112,10 +112,9 @@ export async function saveEmailConfig(formData: FormData) {
         }
 
         revalidatePath('/dashboard/admin/email-config')
-        return { success: true }
     } catch (error) {
         console.error('Error saving email config:', error)
-        return { error: 'Failed to save configuration' }
+        throw new Error('Failed to save configuration')
     }
 }
 
@@ -132,7 +131,7 @@ export async function testEmailConfig(formData: FormData) {
     const testEmail = formData.get('testEmail') as string
 
     if (!host || !port || !user || !password || !fromEmail || !fromName || !testEmail) {
-        return { error: 'All fields are required' }
+        throw new Error('All fields are required')
     }
 
     try {
@@ -166,10 +165,10 @@ export async function testEmailConfig(formData: FormData) {
             `,
         })
 
-        return { success: true, message: 'Email de teste enviado com sucesso!' }
+        console.log('Test email sent successfully')
     } catch (error: any) {
         console.error('Error testing email config:', error)
-        return { error: `Falha ao enviar email de teste: ${error.message}` }
+        throw new Error(`Falha ao enviar email de teste: ${error.message}`)
     }
 }
 

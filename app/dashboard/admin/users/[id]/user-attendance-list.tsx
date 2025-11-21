@@ -171,6 +171,16 @@ export default function UserAttendanceList({
                                             </select>
                                         </div>
 
+                                        <div className="flex-1 min-w-[200px]">
+                                            <label className="block text-xs text-slate-400 mb-1">Observações</label>
+                                            <input
+                                                type="text"
+                                                name="observation"
+                                                defaultValue={attendance.observation || ''}
+                                                className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded text-sm text-slate-200 outline-none focus:border-amber-500"
+                                            />
+                                        </div>
+
                                         <div className="flex gap-2 pb-0.5">
                                             <button
                                                 type="submit"

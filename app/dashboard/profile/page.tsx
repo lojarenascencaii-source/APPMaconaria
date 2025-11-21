@@ -62,7 +62,7 @@ export default async function ProfilePage() {
                                 <p className="text-slate-200 font-medium">{user.name}</p>
                             </div>
                             <div>
-                                <label className="text-sm text-slate-400">Função</label>
+                                <label className="text-sm text-slate-400">Grau</label>
                                 <p className="text-slate-200 font-medium">
                                     {user.role === 'MASTER' ? 'Mestre' :
                                         user.role === 'FELLOWCRAFT' ? 'Companheiro' : 'Aprendiz'}

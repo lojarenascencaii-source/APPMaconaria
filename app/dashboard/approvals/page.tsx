@@ -2,10 +2,11 @@
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
-import { getPendingAttendance, getApprovedAttendance, approveAttendance } from '@/app/actions'
+import { getPendingAttendance, getApprovedAttendance, getRejectedAttendance, getMasters } from '@/app/actions'
 import { LogOut } from 'lucide-react'
 import Link from 'next/link'
 import ApprovedAttendanceTable from '../approved-attendance-table'
+import PendingApprovalsList from './pending-approvals-list'
 
 export default async function ApprovalsPage() {
     const session = await getServerSession(authOptions)
@@ -21,6 +22,8 @@ export default async function ApprovalsPage() {
 
     const pending = await getPendingAttendance()
     const approved = await getApprovedAttendance()
+    const rejected = await getRejectedAttendance()
+    const masters = await getMasters()
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
@@ -59,37 +62,20 @@ export default async function ApprovalsPage() {
                 <div className="space-y-8">
                     <section>
                         <h2 className="text-2xl font-semibold text-amber-500 mb-4">Aprovações Pendentes</h2>
-                        <div className="grid gap-4">
-                            {pending.map((item: any) => (
-                                <div key={item.id} className="bg-slate-900 p-6 rounded-xl border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                    <div>
-                                        <h3 className="font-semibold text-lg text-slate-200">{item.apprentice.name}</h3>
-                                        <p className="text-slate-400 text-sm">
-                                            {item.activity.name} • {new Date(item.date).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}
-                                        </p>
-                                        <p className="text-slate-500 text-sm mt-1">{item.location}</p>
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <form action={approveAttendance.bind(null, item.id)}>
-                                            <button className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors">
-                                                Atestar Presença
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            ))}
-                            {pending.length === 0 && (
-                                <div className="p-8 text-center text-slate-500 bg-slate-900 rounded-xl border border-slate-800">
-                                    Nenhuma solicitação pendente.
-                                </div>
-                            )}
-                        </div>
+                        <PendingApprovalsList pending={pending} masters={masters} />
                     </section>
 
                     <section>
                         <h2 className="text-2xl font-semibold text-green-400 mb-4">Presenças Aprovadas</h2>
                         <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
                             <ApprovedAttendanceTable approved={approved} />
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2 className="text-2xl font-semibold text-red-400 mb-4">Atividades Reprovadas</h2>
+                        <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
+                            <ApprovedAttendanceTable approved={rejected} />
                         </div>
                     </section>
                 </div>

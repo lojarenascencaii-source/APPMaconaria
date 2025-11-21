@@ -84,30 +84,30 @@ export default function ApprovedAttendanceTable({ approved }: { approved: Approv
             <thead className="bg-slate-950 text-slate-400">
                 <tr>
                     <th
-                        className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none"
+                        className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none w-32"
                         onClick={() => handleSort('date')}
                     >
                         Data <SortIcon field="date" />
                     </th>
                     <th
-                        className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none"
+                        className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none w-48"
                         onClick={() => handleSort('apprentice')}
                     >
-                        Aprendiz <SortIcon field="apprentice" />
+                        Maçom <SortIcon field="apprentice" />
                     </th>
                     <th
-                        className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none"
+                        className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none w-48"
                         onClick={() => handleSort('activity')}
                     >
                         Atividade <SortIcon field="activity" />
                     </th>
                     <th
-                        className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none"
+                        className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none w-40"
                         onClick={() => handleSort('location')}
                     >
                         Local <SortIcon field="location" />
                     </th>
-                    <th className="p-4 font-medium text-slate-400">Obs.</th>
+                    <th className="p-4 font-medium text-slate-400 w-64">Obs.</th>
                 </tr>
             </thead>
             <tbody className="divide-y divide-slate-800">

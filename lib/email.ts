@@ -68,10 +68,13 @@ export async function sendApprovalNotification(
     date: string,
     location: string,
     attendanceId: string,
-    approvalToken?: string
+    approvalToken?: string,
+    rejectionToken?: string,
+    observation?: string | null
 ) {
     const approvalUrl = `${process.env.NEXTAUTH_URL}/dashboard/approvals`
     const directApprovalUrl = approvalToken ? `${process.env.NEXTAUTH_URL}/approve/${approvalToken}` : null
+    const directRejectionUrl = rejectionToken ? `${process.env.NEXTAUTH_URL}/reject/${rejectionToken}` : null
     const config = await getDecryptedEmailConfig()
 
     if (!config) {
@@ -99,14 +102,26 @@ export async function sendApprovalNotification(
                         <p style="margin: 8px 0;"><strong>Atividade:</strong> ${activityName}</p>
                         <p style="margin: 8px 0;"><strong>Data:</strong> ${date}</p>
                         <p style="margin: 8px 0;"><strong>Local:</strong> ${location}</p>
+                        ${observation ? `<p style="margin: 8px 0;"><strong>Observações:</strong> ${observation}</p>` : ''}
                     </div>
 
-                    ${directApprovalUrl ? `
+                    ${directApprovalUrl && directRejectionUrl ? `
                     <div style="text-align: center; margin: 30px 0;">
-                        <a href="${directApprovalUrl}" style="display: inline-block; padding: 16px 32px; background-color: #16a34a; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
-                            ✅ Aprovar Atividade
-                        </a>
-                        <p style="color: #666; font-size: 12px; margin-top: 10px;">Este link aprova automaticamente sem precisar de senha.</p>
+                        <table cellpadding="0" cellspacing="0" style="margin: 0 auto;">
+                            <tr>
+                                <td style="padding-right: 10px;">
+                                    <a href="${directApprovalUrl}" style="display: inline-block; padding: 16px 32px; background-color: #16a34a; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
+                                        ✅ Aprovar
+                                    </a>
+                                </td>
+                                <td style="padding-left: 10px;">
+                                    <a href="${directRejectionUrl}" style="display: inline-block; padding: 16px 32px; background-color: #dc2626; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
+                                        ❌ Reprovar
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                        <p style="color: #666; font-size: 12px; margin-top: 10px;">Clique em um dos botões para aprovar ou reprovar automaticamente.</p>
                     </div>
                     ` : `
                     <div style="text-align: center; margin: 30px 0;">
@@ -118,7 +133,7 @@ export async function sendApprovalNotification(
                     
                     <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
                     <p style="color: #999; font-size: 12px; text-align: center;">
-                        Se o botão não funcionar, acesse: <a href="${approvalUrl}" style="color: #666;">${approvalUrl}</a>
+                        Se os botões não funcionarem, acesse: <a href="${approvalUrl}" style="color: #666;">${approvalUrl}</a>
                     </p>
                 </div>
             `,

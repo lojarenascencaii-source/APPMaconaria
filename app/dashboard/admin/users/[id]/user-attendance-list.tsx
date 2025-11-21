@@ -1,8 +1,6 @@
 // @ts-nocheck
 'use client'
 
-import { useState } from 'react'
-import { Trash2, Pencil, CheckCircle, XCircle, Clock } from 'lucide-react'
 import { useState, useMemo } from 'react'
 import { Trash2, Pencil, CheckCircle, XCircle, Clock, ArrowUpDown } from 'lucide-react'
 import { deleteAttendanceAdmin, updateAttendanceAdmin } from '@/app/admin-actions'

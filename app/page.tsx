@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
+// Vercel Preview Trigger
 import { redirect } from "next/navigation"
 
 export default async function Home() {

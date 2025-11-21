@@ -166,6 +166,15 @@ export default function AttendanceTable({
                                     ))}
                                 </select>
                             </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-400 mb-1">Observações</label>
+                                <textarea
+                                    name="observation"
+                                    defaultValue={editingItem.observation || ''}
+                                    rows={3}
+                                    className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none resize-none"
+                                />
+                            </div>
                             <button type="submit" className="w-full px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg transition-colors">
                                 Salvar Alterações
                             </button>

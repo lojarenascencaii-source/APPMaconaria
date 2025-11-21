@@ -50,7 +50,7 @@ export default async function AdminDashboard() {
                             <input type="text" name="password" required className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none" />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-400 mb-1">Função</label>
+                            <label className="block text-sm font-medium text-slate-400 mb-1">Grau</label>
                             <select name="role" required className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none">
                                 <option value="APPRENTICE">Aprendiz</option>
                                 <option value="FELLOWCRAFT">Companheiro</option>

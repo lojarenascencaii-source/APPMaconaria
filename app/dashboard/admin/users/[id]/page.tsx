@@ -57,7 +57,7 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
                                 <p className="font-semibold text-lg">{user.name}</p>
                             </div>
                             <div>
-                                <label className="text-sm text-slate-500 block mb-1">Função</label>
+                                <label className="text-sm text-slate-500 block mb-1">Grau</label>
                                 <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${user.role === 'ADMIN' ? 'bg-purple-500/10 text-purple-400' :
                                     user.role === 'MASTER' ? 'bg-blue-500/10 text-blue-400' :
                                         user.role === 'FELLOWCRAFT' ? 'bg-green-500/10 text-green-400' :

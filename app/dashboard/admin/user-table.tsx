@@ -169,7 +169,7 @@ export default function UserTable({ users }: { users: User[] }) {
                                 <input type="tel" name="phone" defaultValue={editingUser.phone || ''} placeholder="(11) 99999-9999" className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-slate-400 mb-1">Função</label>
+                                <label className="block text-sm font-medium text-slate-400 mb-1">Grau</label>
                                 <select name="role" defaultValue={editingUser.role} required className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none">
                                     <option value="APPRENTICE">Aprendiz</option>
                                     <option value="FELLOWCRAFT">Companheiro</option>
@@ -200,7 +200,7 @@ export default function UserTable({ users }: { users: User[] }) {
                         <th className="p-4">Nome</th>
                         <th className="p-4">Email</th>
                         <th className="p-4">Celular</th>
-                        <th className="p-4">Função</th>
+                        <th className="p-4">Grau</th>
                         <th className="p-4">Iniciação</th>
                         <th className="p-4">Ações</th>
                     </tr>

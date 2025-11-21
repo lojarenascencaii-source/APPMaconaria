@@ -82,7 +82,8 @@ export async function submitAttendance(formData: FormData) {
                 attendance.location,
                 attendance.id,
                 approvalToken,
-                rejectionToken
+                rejectionToken,
+                attendance.observation
             )
         }
 
@@ -388,7 +389,8 @@ export async function resendApprovalRequest(attendanceId: string) {
                 attendance.location,
                 attendance.id,
                 approvalToken,
-                rejectionToken
+                rejectionToken,
+                attendance.observation
             )
         }
 
@@ -501,7 +503,8 @@ export async function reassignMaster(attendanceId: string, newMasterId: string) 
                 attendance.location,
                 attendance.id,
                 approvalToken,
-                rejectionToken
+                rejectionToken,
+                attendance.observation
             )
         }
 

@@ -69,7 +69,8 @@ export async function sendApprovalNotification(
     location: string,
     attendanceId: string,
     approvalToken?: string,
-    rejectionToken?: string
+    rejectionToken?: string,
+    observation?: string | null
 ) {
     const approvalUrl = `${process.env.NEXTAUTH_URL}/dashboard/approvals`
     const directApprovalUrl = approvalToken ? `${process.env.NEXTAUTH_URL}/approve/${approvalToken}` : null
@@ -101,6 +102,7 @@ export async function sendApprovalNotification(
                         <p style="margin: 8px 0;"><strong>Atividade:</strong> ${activityName}</p>
                         <p style="margin: 8px 0;"><strong>Data:</strong> ${date}</p>
                         <p style="margin: 8px 0;"><strong>Local:</strong> ${location}</p>
+                        ${observation ? `<p style="margin: 8px 0;"><strong>Observações:</strong> ${observation}</p>` : ''}
                     </div>
 
                     ${directApprovalUrl && directRejectionUrl ? `

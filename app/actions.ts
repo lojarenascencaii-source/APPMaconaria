@@ -45,8 +45,9 @@ export async function submitAttendance(formData: FormData) {
     }
 
     try {
-        // Generate approval token
+        // Generate approval and rejection tokens
         const approvalToken = crypto.randomBytes(32).toString('hex')
+        const rejectionToken = crypto.randomBytes(32).toString('hex')
         const tokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
 
         // Create attendance
@@ -60,6 +61,7 @@ export async function submitAttendance(formData: FormData) {
                 // @ts-ignore
                 apprenticeId: session.user.id,
                 approvalToken,
+                rejectionToken,
                 tokenExpiry,
             },
             include: {
@@ -79,7 +81,8 @@ export async function submitAttendance(formData: FormData) {
                 new Date(attendance.date).toLocaleDateString('pt-BR', { timeZone: 'UTC' }),
                 attendance.location,
                 attendance.id,
-                approvalToken
+                approvalToken,
+                rejectionToken
             )
         }
 
@@ -359,15 +362,17 @@ export async function resendApprovalRequest(attendanceId: string) {
             return { error: 'Can only resend for pending approvals' }
         }
 
-        // Generate new approval token
+        // Generate new approval and rejection tokens
         const approvalToken = crypto.randomBytes(32).toString('hex')
+        const rejectionToken = crypto.randomBytes(32).toString('hex')
         const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
 
-        // Update attendance with new token
+        // Update attendance with new tokens
         await prisma.attendance.update({
             where: { id: attendanceId },
             data: {
                 approvalToken,
+                rejectionToken,
                 tokenExpiry,
             },
         })
@@ -382,7 +387,8 @@ export async function resendApprovalRequest(attendanceId: string) {
                 new Date(attendance.date).toLocaleDateString('pt-BR', { timeZone: 'UTC' }),
                 attendance.location,
                 attendance.id,
-                approvalToken
+                approvalToken,
+                rejectionToken
             )
         }
 
@@ -390,5 +396,120 @@ export async function resendApprovalRequest(attendanceId: string) {
     } catch (error) {
         console.error(error)
         return { error: 'Failed to resend notification' }
+    }
+}
+
+export async function rejectAttendance(id: string) {
+    const session = await getServerSession(authOptions)
+    if (!session || !session.user) return { error: 'Unauthorized' }
+
+    try {
+        const attendance = await prisma.attendance.findUnique({
+            where: { id },
+        })
+
+        if (!attendance) {
+            return { error: 'Attendance not found' }
+        }
+
+        // @ts-ignore
+        if (attendance.masterId !== session.user.id) {
+            return { error: 'Unauthorized' }
+        }
+
+        if (attendance.status !== 'PENDING') {
+            return { error: 'Can only reject pending attendance' }
+        }
+
+        await prisma.attendance.update({
+            where: { id },
+            data: {
+                status: 'REJECTED',
+                approvalToken: null,
+                rejectionToken: null,
+                tokenExpiry: null,
+            },
+        })
+        revalidatePath('/dashboard')
+        revalidatePath('/dashboard/approvals')
+        return { success: true }
+    } catch (error) {
+        return { error: 'Failed to reject' }
+    }
+}
+
+export async function reassignMaster(attendanceId: string, newMasterId: string) {
+    const session = await getServerSession(authOptions)
+    if (!session || !session.user) return { error: 'Unauthorized' }
+
+    try {
+        const attendance = await prisma.attendance.findUnique({
+            where: { id: attendanceId },
+            include: {
+                activity: true,
+                apprentice: true,
+                master: true,
+            },
+        })
+
+        if (!attendance) {
+            return { error: 'Attendance not found' }
+        }
+
+        // @ts-ignore
+        if (attendance.masterId !== session.user.id) {
+            return { error: 'Unauthorized' }
+        }
+
+        if (attendance.status !== 'PENDING') {
+            return { error: 'Can only reassign pending attendance' }
+        }
+
+        // Get new master details
+        const newMaster = await prisma.user.findUnique({
+            where: { id: newMasterId },
+        })
+
+        if (!newMaster || (newMaster.role !== 'MASTER' && newMaster.role !== 'ADMIN')) {
+            return { error: 'Invalid master selected' }
+        }
+
+        // Generate new tokens for the new master
+        const approvalToken = crypto.randomBytes(32).toString('hex')
+        const rejectionToken = crypto.randomBytes(32).toString('hex')
+        const tokenExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+
+        // Update attendance with new master and tokens
+        await prisma.attendance.update({
+            where: { id: attendanceId },
+            data: {
+                masterId: newMasterId,
+                approvalToken,
+                rejectionToken,
+                tokenExpiry,
+            },
+        })
+
+        // Send email notification to new master
+        if (newMaster.email) {
+            await sendApprovalNotification(
+                newMaster.email,
+                newMaster.name,
+                attendance.apprentice.name,
+                attendance.activity.name,
+                new Date(attendance.date).toLocaleDateString('pt-BR', { timeZone: 'UTC' }),
+                attendance.location,
+                attendance.id,
+                approvalToken,
+                rejectionToken
+            )
+        }
+
+        revalidatePath('/dashboard')
+        revalidatePath('/dashboard/approvals')
+        return { success: true }
+    } catch (error) {
+        console.error(error)
+        return { error: 'Failed to reassign master' }
     }
 }

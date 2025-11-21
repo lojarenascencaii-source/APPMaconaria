@@ -51,6 +51,7 @@ model Attendance {
   apprenticeId String
   masterId     String
   approvalToken String?  @unique // Token for one-click email approval
+  rejectionToken String? @unique // Token for one-click email rejection
   tokenExpiry   DateTime? // Token expiration date
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt

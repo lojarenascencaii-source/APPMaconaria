@@ -93,7 +93,7 @@ export default function ApprovedAttendanceTable({ approved }: { approved: Approv
                         className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none"
                         onClick={() => handleSort('apprentice')}
                     >
-                        Aprendiz <SortIcon field="apprentice" />
+                        Maçom <SortIcon field="apprentice" />
                     </th>
                     <th
                         className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none"

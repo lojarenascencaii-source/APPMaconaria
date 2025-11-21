@@ -8,7 +8,7 @@ import Link from 'next/link'
 import { ArrowLeft, User, Calendar, Mail, Phone } from 'lucide-react'
 import UserAttendanceList from './user-attendance-list'
 
-export default async function UserDetailPage({ params }: { params: { id: string } }) {
+export default async function UserDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const session = await getServerSession(authOptions)
 
     // @ts-ignore
@@ -16,7 +16,8 @@ export default async function UserDetailPage({ params }: { params: { id: string 
         redirect('/dashboard')
     }
 
-    const { user, attendances } = await getUserDetails(params.id)
+    const { id } = await params
+    const { user, attendances } = await getUserDetails(id)
     const activities = await getActivities()
     const masters = await getMasters()
 
@@ -57,9 +58,9 @@ export default async function UserDetailPage({ params }: { params: { id: string 
                             <div>
                                 <label className="text-sm text-slate-500 block mb-1">Função</label>
                                 <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${user.role === 'ADMIN' ? 'bg-purple-500/10 text-purple-400' :
-                                        user.role === 'MASTER' ? 'bg-blue-500/10 text-blue-400' :
-                                            user.role === 'FELLOWCRAFT' ? 'bg-green-500/10 text-green-400' :
-                                                'bg-amber-500/10 text-amber-400'
+                                    user.role === 'MASTER' ? 'bg-blue-500/10 text-blue-400' :
+                                        user.role === 'FELLOWCRAFT' ? 'bg-green-500/10 text-green-400' :
+                                            'bg-amber-500/10 text-amber-400'
                                     }`}>
                                     {getRoleLabel(user.role)}
                                 </span>

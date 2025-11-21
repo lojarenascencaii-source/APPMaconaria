@@ -9,6 +9,7 @@ type PendingItem = {
     id: string
     date: Date
     location: string
+    observation?: string | null
     apprentice: { name: string }
     activity: { name: string }
 }
@@ -38,6 +39,11 @@ export default function PendingApprovalsList({
                             {item.activity.name} • {new Date(item.date).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}
                         </p>
                         <p className="text-slate-500 text-sm mt-1">{item.location}</p>
+                        {item.observation && (
+                            <p className="text-slate-400 text-sm mt-2 italic">
+                                <span className="font-semibold text-amber-500">Observações:</span> {item.observation}
+                            </p>
+                        )}
                     </div>
 
                     <div className="flex gap-2 flex-wrap">

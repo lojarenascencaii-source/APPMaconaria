@@ -231,6 +231,21 @@ export async function getApprovedAttendance() {
     })
 }
 
+export async function getRejectedAttendance() {
+    const session = await getServerSession(authOptions)
+    if (!session || !session.user) return []
+
+    return await prisma.attendance.findMany({
+        where: {
+            // @ts-ignore
+            masterId: session.user.id,
+            status: 'REJECTED',
+        },
+        include: { activity: true, apprentice: true },
+        orderBy: { date: 'desc' },
+    })
+}
+
 export async function getCurrentUser() {
     const session = await getServerSession(authOptions)
     if (!session || !session.user) {

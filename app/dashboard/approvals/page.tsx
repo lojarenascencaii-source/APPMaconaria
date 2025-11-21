@@ -2,7 +2,7 @@
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
-import { getPendingAttendance, getApprovedAttendance, getMasters } from '@/app/actions'
+import { getPendingAttendance, getApprovedAttendance, getRejectedAttendance, getMasters } from '@/app/actions'
 import { LogOut } from 'lucide-react'
 import Link from 'next/link'
 import ApprovedAttendanceTable from '../approved-attendance-table'
@@ -22,6 +22,7 @@ export default async function ApprovalsPage() {
 
     const pending = await getPendingAttendance()
     const approved = await getApprovedAttendance()
+    const rejected = await getRejectedAttendance()
     const masters = await getMasters()
 
     return (
@@ -68,6 +69,13 @@ export default async function ApprovalsPage() {
                         <h2 className="text-2xl font-semibold text-green-400 mb-4">Presenças Aprovadas</h2>
                         <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
                             <ApprovedAttendanceTable approved={approved} />
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2 className="text-2xl font-semibold text-red-400 mb-4">Atividades Reprovadas</h2>
+                        <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
+                            <ApprovedAttendanceTable approved={rejected} />
                         </div>
                     </section>
                 </div>

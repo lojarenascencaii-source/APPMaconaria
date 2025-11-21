@@ -244,3 +244,47 @@ export async function getUserDetails(id: string) {
 
     return { user, attendances }
 }
+
+export async function updateAttendanceAdmin(formData: FormData) {
+    await checkAdmin()
+
+    const id = formData.get('id') as string
+    const date = formData.get('date') as string
+    const location = formData.get('location') as string
+    const activityId = formData.get('activityId') as string
+    const masterId = formData.get('masterId') as string
+
+    if (!id || !date || !location || !activityId || !masterId) {
+        throw new Error('Missing fields')
+    }
+
+    try {
+        await prisma.attendance.update({
+            where: { id },
+            data: {
+                date: new Date(date),
+                location,
+                activityId,
+                masterId,
+            },
+        })
+        revalidatePath('/dashboard/admin')
+    } catch (error) {
+        console.error('Update attendance error:', error)
+        throw new Error('Failed to update attendance')
+    }
+}
+
+export async function deleteAttendanceAdmin(id: string) {
+    await checkAdmin()
+
+    try {
+        await prisma.attendance.delete({
+            where: { id }
+        })
+        revalidatePath('/dashboard/admin')
+    } catch (error) {
+        console.error('Delete attendance error:', error)
+        throw new Error('Failed to delete attendance')
+    }
+}

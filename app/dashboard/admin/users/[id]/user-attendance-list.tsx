@@ -3,7 +3,9 @@
 
 import { useState } from 'react'
 import { Trash2, Pencil, CheckCircle, XCircle, Clock } from 'lucide-react'
-import { deleteAttendance, updateAttendance } from '@/app/actions'
+import { useState, useMemo } from 'react'
+import { Trash2, Pencil, CheckCircle, XCircle, Clock, ArrowUpDown } from 'lucide-react'
+import { deleteAttendanceAdmin, updateAttendanceAdmin } from '@/app/admin-actions'
 
 type Attendance = {
     id: string
@@ -35,6 +37,48 @@ export default function UserAttendanceList({
 }) {
     const [editingId, setEditingId] = useState<string | null>(null)
     const [deletingId, setDeletingId] = useState<string | null>(null)
+    const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' } | null>(null)
+
+    const sortedAttendances = useMemo(() => {
+        let sortableItems = [...attendances]
+        if (sortConfig !== null) {
+            sortableItems.sort((a, b) => {
+                let aValue: any = a[sortConfig.key as keyof Attendance]
+                let bValue: any = b[sortConfig.key as keyof Attendance]
+
+                // Handle nested objects
+                if (sortConfig.key === 'activity') {
+                    aValue = a.activity.name
+                    bValue = b.activity.name
+                } else if (sortConfig.key === 'master') {
+                    aValue = a.master.name
+                    bValue = b.master.name
+                }
+
+                if (aValue < bValue) {
+                    return sortConfig.direction === 'asc' ? -1 : 1
+                }
+                if (aValue > bValue) {
+                    return sortConfig.direction === 'asc' ? 1 : -1
+                }
+                return 0
+            })
+        }
+        return sortableItems
+    }, [attendances, sortConfig])
+
+    const requestSort = (key: string) => {
+        let direction: 'asc' | 'desc' = 'asc'
+        if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc'
+        }
+        setSortConfig({ key, direction })
+    }
+
+    const SortIcon = ({ columnKey }: { columnKey: string }) => {
+        if (sortConfig?.key !== columnKey) return <ArrowUpDown className="w-4 h-4 ml-1 text-slate-600" />
+        return <ArrowUpDown className={`w-4 h-4 ml-1 ${sortConfig.direction === 'asc' ? 'text-amber-500' : 'text-amber-500 rotate-180'}`} />
+    }
 
     const getStatusBadge = (status: string) => {
         switch (status) {
@@ -52,21 +96,33 @@ export default function UserAttendanceList({
             <table className="w-full text-left border-collapse">
                 <thead>
                     <tr className="text-slate-400 border-b border-slate-800 text-sm">
-                        <th className="p-4 font-medium">Data</th>
-                        <th className="p-4 font-medium">Atividade</th>
-                        <th className="p-4 font-medium">Local</th>
-                        <th className="p-4 font-medium">Mestre</th>
-                        <th className="p-4 font-medium">Status</th>
-                        <th className="p-4 font-medium text-right">Ações</th>
+                        <tr className="text-slate-400 border-b border-slate-800 text-sm">
+                            <th className="p-4 font-medium cursor-pointer hover:text-white transition-colors" onClick={() => requestSort('date')}>
+                                <div className="flex items-center">Data <SortIcon columnKey="date" /></div>
+                            </th>
+                            <th className="p-4 font-medium cursor-pointer hover:text-white transition-colors" onClick={() => requestSort('activity')}>
+                                <div className="flex items-center">Atividade <SortIcon columnKey="activity" /></div>
+                            </th>
+                            <th className="p-4 font-medium cursor-pointer hover:text-white transition-colors" onClick={() => requestSort('location')}>
+                                <div className="flex items-center">Local <SortIcon columnKey="location" /></div>
+                            </th>
+                            <th className="p-4 font-medium cursor-pointer hover:text-white transition-colors" onClick={() => requestSort('master')}>
+                                <div className="flex items-center">Mestre <SortIcon columnKey="master" /></div>
+                            </th>
+                            <th className="p-4 font-medium cursor-pointer hover:text-white transition-colors" onClick={() => requestSort('status')}>
+                                <div className="flex items-center">Status <SortIcon columnKey="status" /></div>
+                            </th>
+                            <th className="p-4 font-medium text-right">Ações</th>
+                        </tr>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800">
-                    {attendances.map((attendance) => (
+                    {sortedAttendances.map((attendance) => (
                         <tr key={attendance.id} className="hover:bg-slate-800/50 transition-colors">
                             {editingId === attendance.id ? (
                                 <td colSpan={6} className="p-4 bg-slate-800/50">
                                     <form action={async (formData) => {
-                                        await updateAttendance(formData)
+                                        await updateAttendanceAdmin(formData)
                                         setEditingId(null)
                                     }} className="flex flex-wrap gap-4 items-end">
                                         <input type="hidden" name="id" value={attendance.id} />
@@ -157,7 +213,7 @@ export default function UserAttendanceList({
                                                 <div className="flex items-center gap-2 bg-slate-900 p-1 rounded border border-red-500/50 absolute right-4 mt-[-8px]">
                                                     <span className="text-xs text-red-400 font-medium px-1">Confirmar?</span>
                                                     <form action={async () => {
-                                                        await deleteAttendance(attendance.id)
+                                                        await deleteAttendanceAdmin(attendance.id)
                                                         setDeletingId(null)
                                                     }}>
                                                         <button className="text-xs bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700">Sim</button>

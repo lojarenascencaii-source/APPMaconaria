@@ -1,4 +1,5 @@
 'use client'
+import Link from 'next/link'
 
 type Activity = {
     id: string
@@ -57,32 +58,37 @@ export default function ProgressDashboard({ users }: { users: User[] }) {
         )
 
         return (
-            <div key={user.id} className="bg-slate-800 p-4 rounded-lg border border-slate-700 flex flex-col h-full">
-                <h3 className="text-lg font-semibold text-slate-200 mb-3 truncate" title={user.name}>{user.name}</h3>
-                <div className="grid grid-cols-1 gap-3">
-                    {filteredTargets.map(([activityName, target]) => {
-                        const count = counts[activityName] || 0
-                        const percentage = Math.min(100, (count / target) * 100)
-                        const isComplete = count >= target
+            <Link href={`/dashboard/admin/users/${user.id}`} key={user.id} className="block h-full group">
+                <div className="bg-slate-800 p-4 rounded-lg border border-slate-700 flex flex-col h-full group-hover:border-amber-500/50 transition-colors">
+                    <div className="flex justify-between items-start mb-3">
+                        <h3 className="text-lg font-semibold text-slate-200 truncate group-hover:text-amber-500 transition-colors" title={user.name}>{user.name}</h3>
+                        <span className="text-xs text-slate-500 bg-slate-900 px-2 py-1 rounded">Ver Detalhes</span>
+                    </div>
+                    <div className="grid grid-cols-1 gap-3">
+                        {filteredTargets.map(([activityName, target]) => {
+                            const count = counts[activityName] || 0
+                            const percentage = Math.min(100, (count / target) * 100)
+                            const isComplete = count >= target
 
-                        return (
-                            <div key={activityName} className="space-y-1">
-                                <div className="flex justify-between text-xs text-slate-400">
-                                    <span className="truncate pr-2" title={activityName}>{activityName}</span>
-                                    <span>{count}/{target}</span>
+                            return (
+                                <div key={activityName} className="space-y-1">
+                                    <div className="flex justify-between text-xs text-slate-400">
+                                        <span className="truncate pr-2" title={activityName}>{activityName}</span>
+                                        <span>{count}/{target}</span>
+                                    </div>
+                                    <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+                                        <div
+                                            className={`h-full rounded-full transition-all duration-500 ${isComplete ? 'bg-green-500' : 'bg-amber-500'
+                                                }`}
+                                            style={{ width: `${percentage}%` }}
+                                        />
+                                    </div>
                                 </div>
-                                <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
-                                    <div
-                                        className={`h-full rounded-full transition-all duration-500 ${isComplete ? 'bg-green-500' : 'bg-amber-500'
-                                            }`}
-                                        style={{ width: `${percentage}%` }}
-                                    />
-                                </div>
-                            </div>
-                        )
-                    })}
+                            )
+                        })}
+                    </div>
                 </div>
-            </div>
+            </Link>
         )
     }
 

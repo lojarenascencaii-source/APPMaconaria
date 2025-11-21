@@ -94,24 +94,22 @@ export default function UserAttendanceList({
             <table className="w-full text-left border-collapse">
                 <thead>
                     <tr className="text-slate-400 border-b border-slate-800 text-sm">
-                        <tr className="text-slate-400 border-b border-slate-800 text-sm">
-                            <th className="p-4 font-medium cursor-pointer hover:text-white transition-colors" onClick={() => requestSort('date')}>
-                                <div className="flex items-center">Data <SortIcon columnKey="date" /></div>
-                            </th>
-                            <th className="p-4 font-medium cursor-pointer hover:text-white transition-colors" onClick={() => requestSort('activity')}>
-                                <div className="flex items-center">Atividade <SortIcon columnKey="activity" /></div>
-                            </th>
-                            <th className="p-4 font-medium cursor-pointer hover:text-white transition-colors" onClick={() => requestSort('location')}>
-                                <div className="flex items-center">Local <SortIcon columnKey="location" /></div>
-                            </th>
-                            <th className="p-4 font-medium cursor-pointer hover:text-white transition-colors" onClick={() => requestSort('master')}>
-                                <div className="flex items-center">Mestre <SortIcon columnKey="master" /></div>
-                            </th>
-                            <th className="p-4 font-medium cursor-pointer hover:text-white transition-colors" onClick={() => requestSort('status')}>
-                                <div className="flex items-center">Status <SortIcon columnKey="status" /></div>
-                            </th>
-                            <th className="p-4 font-medium text-right">Ações</th>
-                        </tr>
+                        <th className="p-4 font-medium cursor-pointer hover:text-white transition-colors" onClick={() => requestSort('date')}>
+                            <div className="flex items-center">Data <SortIcon columnKey="date" /></div>
+                        </th>
+                        <th className="p-4 font-medium cursor-pointer hover:text-white transition-colors" onClick={() => requestSort('activity')}>
+                            <div className="flex items-center">Atividade <SortIcon columnKey="activity" /></div>
+                        </th>
+                        <th className="p-4 font-medium cursor-pointer hover:text-white transition-colors" onClick={() => requestSort('location')}>
+                            <div className="flex items-center">Local <SortIcon columnKey="location" /></div>
+                        </th>
+                        <th className="p-4 font-medium cursor-pointer hover:text-white transition-colors" onClick={() => requestSort('master')}>
+                            <div className="flex items-center">Mestre <SortIcon columnKey="master" /></div>
+                        </th>
+                        <th className="p-4 font-medium cursor-pointer hover:text-white transition-colors" onClick={() => requestSort('status')}>
+                            <div className="flex items-center">Status <SortIcon columnKey="status" /></div>
+                        </th>
+                        <th className="p-4 font-medium text-right">Ações</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800">

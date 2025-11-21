@@ -55,7 +55,6 @@ export async function submitAttendance(formData: FormData) {
                 date: new Date(date),
                 location,
                 activityId,
-                activityId,
                 masterId,
                 observation: observation || null,
                 // @ts-ignore
@@ -171,7 +170,6 @@ export async function updateAttendance(formData: FormData) {
     const id = formData.get('id') as string
     const date = formData.get('date') as string
     const location = formData.get('location') as string
-    const activityId = formData.get('activityId') as string
     const activityId = formData.get('activityId') as string
     const masterId = formData.get('masterId') as string
     const observation = formData.get('observation') as string

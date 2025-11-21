@@ -25,7 +25,7 @@ type AttendanceItem = {
     master: Master
 }
 
-type SortField = 'date' | 'activity' | 'location' | 'master' | 'status'
+type SortField = 'date' | 'activity' | 'location' | 'master' | 'status' | 'observation'
 type SortOrder = 'asc' | 'desc'
 
 export default function AttendanceTable({
@@ -75,6 +75,10 @@ export default function AttendanceTable({
                 case 'status':
                     aValue = a.status.toLowerCase()
                     bValue = b.status.toLowerCase()
+                    break
+                case 'observation':
+                    aValue = (a.observation || '').toLowerCase()
+                    bValue = (b.observation || '').toLowerCase()
                     break
             }
 
@@ -191,7 +195,12 @@ export default function AttendanceTable({
                         >
                             Local <SortIcon field="location" />
                         </th>
-                        <th className="p-4 font-medium text-slate-400">Obs.</th>
+                        <th
+                            className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none min-w-[200px]"
+                            onClick={() => handleSort('observation')}
+                        >
+                            Observações <SortIcon field="observation" />
+                        </th>
                         <th
                             className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none"
                             onClick={() => handleSort('master')}
@@ -213,8 +222,10 @@ export default function AttendanceTable({
                             <td className="p-4">{new Date(item.date).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</td>
                             <td className="p-4">{item.activity.name}</td>
                             <td className="p-4">{item.location}</td>
-                            <td className="p-4 text-slate-400 text-sm max-w-[200px] truncate" title={item.observation || ''}>
-                                {item.observation || '-'}
+                            <td className="p-4 text-slate-300 max-w-[250px]">
+                                <div className="truncate" title={item.observation || '-'}>
+                                    {item.observation || '-'}
+                                </div>
                             </td>
                             <td className="p-4">{item.master.name}</td>
                             <td className="p-4">

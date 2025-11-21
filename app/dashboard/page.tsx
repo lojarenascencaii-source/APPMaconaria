@@ -113,6 +113,15 @@ async function ApprenticeView() {
                             </select>
                         </div>
                     </div>
+                    <div>
+                        <label className="block text-sm font-medium text-slate-400 mb-1">Observações (Opcional)</label>
+                        <textarea
+                            name="observation"
+                            rows={3}
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none resize-none"
+                            placeholder="Alguma observação sobre a atividade..."
+                        />
+                    </div>
                     <button type="submit" className="px-6 py-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg transition-colors">
                         Enviar Registro
                     </button>
@@ -175,6 +184,15 @@ async function FellowcraftView() {
                                 ))}
                             </select>
                         </div>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-slate-400 mb-1">Observações (Opcional)</label>
+                        <textarea
+                            name="observation"
+                            rows={3}
+                            className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none resize-none"
+                            placeholder="Alguma observação sobre a atividade..."
+                        />
                     </div>
                     <button type="submit" className="px-6 py-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg transition-colors">
                         Enviar Registro

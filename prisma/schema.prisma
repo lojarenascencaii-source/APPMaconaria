@@ -44,6 +44,7 @@ model Attendance {
   date         DateTime
   location     String
   status       String   @default("PENDING") // "PENDING", "APPROVED", "REJECTED"
+  observation  String?
   
   // Relations
   activityId   String

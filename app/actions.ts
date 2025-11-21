@@ -38,6 +38,7 @@ export async function submitAttendance(formData: FormData) {
     const location = formData.get('location') as string
     const activityId = formData.get('activityId') as string
     const masterId = formData.get('masterId') as string
+    const observation = formData.get('observation') as string
 
     if (!date || !location || !activityId || !masterId) {
         return { error: 'Missing fields' }
@@ -54,7 +55,9 @@ export async function submitAttendance(formData: FormData) {
                 date: new Date(date),
                 location,
                 activityId,
+                activityId,
                 masterId,
+                observation: observation || null,
                 // @ts-ignore
                 apprenticeId: session.user.id,
                 approvalToken,
@@ -169,7 +172,9 @@ export async function updateAttendance(formData: FormData) {
     const date = formData.get('date') as string
     const location = formData.get('location') as string
     const activityId = formData.get('activityId') as string
+    const activityId = formData.get('activityId') as string
     const masterId = formData.get('masterId') as string
+    const observation = formData.get('observation') as string
 
     if (!id || !date || !location || !activityId || !masterId) {
         return { error: 'Missing fields' }
@@ -196,7 +201,9 @@ export async function updateAttendance(formData: FormData) {
                 date: new Date(date),
                 location,
                 activityId,
+                activityId,
                 masterId,
+                observation: observation || null,
             },
         })
         revalidatePath('/dashboard')

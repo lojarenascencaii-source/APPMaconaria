@@ -20,6 +20,7 @@ type AttendanceItem = {
     date: Date
     location: string
     status: string
+    observation: string | null
     activity: Activity
     master: Master
 }
@@ -190,6 +191,7 @@ export default function AttendanceTable({
                         >
                             Local <SortIcon field="location" />
                         </th>
+                        <th className="p-4 font-medium text-slate-400">Obs.</th>
                         <th
                             className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none"
                             onClick={() => handleSort('master')}
@@ -211,6 +213,9 @@ export default function AttendanceTable({
                             <td className="p-4">{new Date(item.date).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</td>
                             <td className="p-4">{item.activity.name}</td>
                             <td className="p-4">{item.location}</td>
+                            <td className="p-4 text-slate-400 text-sm max-w-[200px] truncate" title={item.observation || ''}>
+                                {item.observation || '-'}
+                            </td>
                             <td className="p-4">{item.master.name}</td>
                             <td className="p-4">
                                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${item.status === 'APPROVED' ? 'bg-green-500/10 text-green-400' :
@@ -261,7 +266,7 @@ export default function AttendanceTable({
                     ))}
                     {history.length === 0 && (
                         <tr>
-                            <td colSpan={6} className="p-8 text-center text-slate-500">Nenhum registro encontrado.</td>
+                            <td colSpan={7} className="p-8 text-center text-slate-500">Nenhum registro encontrado.</td>
                         </tr>
                     )}
                 </tbody>

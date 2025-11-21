@@ -9,6 +9,7 @@ type Attendance = {
     id: string
     date: Date
     location: string
+    observation: string | null
     status: string
     activity: { name: string }
     master: { name: string }
@@ -103,6 +104,7 @@ export default function UserAttendanceList({
                         <th className="p-4 font-medium cursor-pointer hover:text-white transition-colors" onClick={() => requestSort('location')}>
                             <div className="flex items-center">Local <SortIcon columnKey="location" /></div>
                         </th>
+                        <th className="p-4 font-medium text-slate-400">Obs.</th>
                         <th className="p-4 font-medium cursor-pointer hover:text-white transition-colors" onClick={() => requestSort('master')}>
                             <div className="flex items-center">Mestre <SortIcon columnKey="master" /></div>
                         </th>
@@ -116,7 +118,7 @@ export default function UserAttendanceList({
                     {sortedAttendances.map((attendance) => (
                         <tr key={attendance.id} className="hover:bg-slate-800/50 transition-colors">
                             {editingId === attendance.id ? (
-                                <td colSpan={6} className="p-4 bg-slate-800/50">
+                                <td colSpan={7} className="p-4 bg-slate-800/50">
                                     <form action={async (formData) => {
                                         await updateAttendanceAdmin(formData)
                                         setEditingId(null)
@@ -193,6 +195,9 @@ export default function UserAttendanceList({
                                     </td>
                                     <td className="p-4 text-slate-300">{attendance.activity.name}</td>
                                     <td className="p-4 text-slate-300">{attendance.location}</td>
+                                    <td className="p-4 text-slate-400 text-sm max-w-[150px] truncate" title={attendance.observation || ''}>
+                                        {attendance.observation || '-'}
+                                    </td>
                                     <td className="p-4 text-slate-300">{attendance.master.name}</td>
                                     <td className="p-4">{getStatusBadge(attendance.status)}</td>
                                     <td className="p-4 text-right">
@@ -238,7 +243,7 @@ export default function UserAttendanceList({
                     ))}
                     {attendances.length === 0 && (
                         <tr>
-                            <td colSpan={6} className="p-8 text-center text-slate-500 italic">
+                            <td colSpan={7} className="p-8 text-center text-slate-500 italic">
                                 Nenhuma atividade registrada.
                             </td>
                         </tr>

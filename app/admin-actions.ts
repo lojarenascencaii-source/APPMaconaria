@@ -253,6 +253,7 @@ export async function updateAttendanceAdmin(formData: FormData) {
     const location = formData.get('location') as string
     const activityId = formData.get('activityId') as string
     const masterId = formData.get('masterId') as string
+    const observation = formData.get('observation') as string
 
     if (!id || !date || !location || !activityId || !masterId) {
         throw new Error('Missing fields')
@@ -266,6 +267,7 @@ export async function updateAttendanceAdmin(formData: FormData) {
                 location,
                 activityId,
                 masterId,
+                observation: observation || null,
             },
         })
         revalidatePath('/dashboard/admin')

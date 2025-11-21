@@ -17,6 +17,7 @@ type ApprovedAttendance = {
     id: string
     date: Date
     location: string
+    observation: string | null
     activity: Activity
     apprentice: Apprentice
 }
@@ -106,6 +107,7 @@ export default function ApprovedAttendanceTable({ approved }: { approved: Approv
                     >
                         Local <SortIcon field="location" />
                     </th>
+                    <th className="p-4 font-medium text-slate-400">Obs.</th>
                 </tr>
             </thead>
             <tbody className="divide-y divide-slate-800">
@@ -115,11 +117,14 @@ export default function ApprovedAttendanceTable({ approved }: { approved: Approv
                         <td className="p-4">{item.apprentice.name}</td>
                         <td className="p-4">{item.activity.name}</td>
                         <td className="p-4">{item.location}</td>
+                        <td className="p-4 text-slate-400 text-sm max-w-[200px] truncate" title={item.observation || ''}>
+                            {item.observation || '-'}
+                        </td>
                     </tr>
                 ))}
                 {sortedApproved.length === 0 && (
                     <tr>
-                        <td colSpan={4} className="p-8 text-center text-slate-500">Nenhuma presença aprovada.</td>
+                        <td colSpan={5} className="p-8 text-center text-slate-500">Nenhuma presença aprovada.</td>
                     </tr>
                 )}
             </tbody>

@@ -36,8 +36,9 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
             <div className="max-w-6xl mx-auto space-y-8">
                 <div className="flex items-center gap-4">
                     <Link
-                        href="/dashboard/admin"
+                        href="/dashboard"
                         className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                        title="Voltar para o Dashboard"
                     >
                         <ArrowLeft className="w-6 h-6" />
                     </Link>

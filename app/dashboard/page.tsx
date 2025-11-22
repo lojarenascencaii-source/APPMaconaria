@@ -89,7 +89,7 @@ async function ApprenticeView() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-slate-400 mb-1">Data</label>
-                            <input type="date" name="date" required className="w-full px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none" />
+                            <input type="date" name="date" required className="w-full max-w-full min-w-0 px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-slate-400 mb-1">Local (Loja e Oriente)</label>

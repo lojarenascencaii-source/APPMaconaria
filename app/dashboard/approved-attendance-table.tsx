@@ -80,54 +80,56 @@ export default function ApprovedAttendanceTable({ approved }: { approved: Approv
     }
 
     return (
-        <table className="w-full text-left">
-            <thead className="bg-slate-950 text-slate-400">
-                <tr>
-                    <th
-                        className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none w-32"
-                        onClick={() => handleSort('date')}
-                    >
-                        Data <SortIcon field="date" />
-                    </th>
-                    <th
-                        className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none w-48"
-                        onClick={() => handleSort('apprentice')}
-                    >
-                        Maçom <SortIcon field="apprentice" />
-                    </th>
-                    <th
-                        className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none w-48"
-                        onClick={() => handleSort('activity')}
-                    >
-                        Atividade <SortIcon field="activity" />
-                    </th>
-                    <th
-                        className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none w-40"
-                        onClick={() => handleSort('location')}
-                    >
-                        Local <SortIcon field="location" />
-                    </th>
-                    <th className="p-4 font-medium text-slate-400 w-64">Obs.</th>
-                </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-800">
-                {sortedApproved.map((item) => (
-                    <tr key={item.id} className="hover:bg-slate-800/50">
-                        <td className="p-4">{new Date(item.date).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</td>
-                        <td className="p-4">{item.apprentice.name}</td>
-                        <td className="p-4">{item.activity.name}</td>
-                        <td className="p-4">{item.location}</td>
-                        <td className="p-4 text-slate-400 text-sm max-w-[200px] truncate" title={item.observation || ''}>
-                            {item.observation || '-'}
-                        </td>
-                    </tr>
-                ))}
-                {sortedApproved.length === 0 && (
+        <div className="overflow-x-auto">
+            <table className="w-full text-left min-w-[800px]">
+                <thead className="bg-slate-950 text-slate-400">
                     <tr>
-                        <td colSpan={5} className="p-8 text-center text-slate-500">Nenhuma presença aprovada.</td>
+                        <th
+                            className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none w-32"
+                            onClick={() => handleSort('date')}
+                        >
+                            Data <SortIcon field="date" />
+                        </th>
+                        <th
+                            className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none w-48"
+                            onClick={() => handleSort('apprentice')}
+                        >
+                            Maçom <SortIcon field="apprentice" />
+                        </th>
+                        <th
+                            className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none w-48"
+                            onClick={() => handleSort('activity')}
+                        >
+                            Atividade <SortIcon field="activity" />
+                        </th>
+                        <th
+                            className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none w-40"
+                            onClick={() => handleSort('location')}
+                        >
+                            Local <SortIcon field="location" />
+                        </th>
+                        <th className="p-4 font-medium text-slate-400 w-64">Obs.</th>
                     </tr>
-                )}
-            </tbody>
-        </table>
+                </thead>
+                <tbody className="divide-y divide-slate-800">
+                    {sortedApproved.map((item) => (
+                        <tr key={item.id} className="hover:bg-slate-800/50">
+                            <td className="p-4">{new Date(item.date).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</td>
+                            <td className="p-4">{item.apprentice.name}</td>
+                            <td className="p-4">{item.activity.name}</td>
+                            <td className="p-4">{item.location}</td>
+                            <td className="p-4 text-slate-400 text-sm max-w-[200px] truncate" title={item.observation || ''}>
+                                {item.observation || '-'}
+                            </td>
+                        </tr>
+                    ))}
+                    {sortedApproved.length === 0 && (
+                        <tr>
+                            <td colSpan={5} className="p-8 text-center text-slate-500">Nenhuma presença aprovada.</td>
+                        </tr>
+                    )}
+                </tbody>
+            </table>
+        </div>
     )
 }

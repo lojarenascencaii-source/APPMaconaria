@@ -183,114 +183,116 @@ export default function AttendanceTable({
                 </div>
             )}
 
-            <table className="w-full text-left">
-                <thead className="bg-slate-950 text-slate-400">
-                    <tr>
-                        <th
-                            className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none"
-                            onClick={() => handleSort('date')}
-                        >
-                            Data <SortIcon field="date" />
-                        </th>
-                        <th
-                            className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none"
-                            onClick={() => handleSort('activity')}
-                        >
-                            Atividade <SortIcon field="activity" />
-                        </th>
-                        <th
-                            className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none"
-                            onClick={() => handleSort('location')}
-                        >
-                            Local <SortIcon field="location" />
-                        </th>
-                        <th
-                            className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none min-w-[200px]"
-                            onClick={() => handleSort('observation')}
-                        >
-                            Observações <SortIcon field="observation" />
-                        </th>
-                        <th
-                            className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none"
-                            onClick={() => handleSort('master')}
-                        >
-                            Mestre <SortIcon field="master" />
-                        </th>
-                        <th
-                            className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none"
-                            onClick={() => handleSort('status')}
-                        >
-                            Status <SortIcon field="status" />
-                        </th>
-                        <th className="p-4">Ações</th>
-                    </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-800">
-                    {sortedHistory.map((item) => (
-                        <tr key={item.id} className="hover:bg-slate-800/50">
-                            <td className="p-4">{new Date(item.date).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</td>
-                            <td className="p-4">{item.activity.name}</td>
-                            <td className="p-4">{item.location}</td>
-                            <td className="p-4 text-slate-300 max-w-[250px]">
-                                <div className="truncate" title={item.observation || '-'}>
-                                    {item.observation || '-'}
-                                </div>
-                            </td>
-                            <td className="p-4">{item.master.name}</td>
-                            <td className="p-4">
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${item.status === 'APPROVED' ? 'bg-green-500/10 text-green-400' :
-                                    item.status === 'REJECTED' ? 'bg-red-500/10 text-red-400' :
-                                        'bg-yellow-500/10 text-yellow-400'
-                                    }`}>
-                                    {item.status === 'APPROVED' ? 'Aprovado' : item.status === 'REJECTED' ? 'Rejeitado' : 'Pendente'}
-                                </span>
-                            </td>
-                            <td className="p-4">
-                                {item.status === 'PENDING' && (
-                                    <div className="flex gap-2">
-                                        <button
-                                            onClick={() => setEditingItem(item)}
-                                            className="p-2 text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"
-                                            title="Editar"
-                                        >
-                                            <Pencil className="w-4 h-4" />
-                                        </button>
-                                        <form action={async () => {
-                                            const result = await resendApprovalRequest(item.id)
-                                            if (result?.error) {
-                                                alert(result.error)
-                                            } else {
-                                                alert('Solicitação reenviada com sucesso!')
-                                            }
-                                        }}>
-                                            <button
-                                                type="submit"
-                                                className="p-2 text-green-400 hover:bg-green-500/10 rounded-lg transition-colors"
-                                                title="Reenviar Solicitação"
-                                            >
-                                                <Mail className="w-4 h-4" />
-                                            </button>
-                                        </form>
-                                        <form action={deleteAttendance.bind(null, item.id)}>
-                                            <button
-                                                className="p-2 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-                                                title="Excluir"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                        </form>
-                                    </div>
-                                )}
-                            </td>
-                        </tr>
-                    ))}
-                    {history.length === 0 && (
+            <div className="overflow-x-auto">
+                <table className="w-full text-left min-w-[1000px]">
+                    <thead className="bg-slate-950 text-slate-400">
                         <tr>
-                            <td colSpan={7} className="p-8 text-center text-slate-500">Nenhum registro encontrado.</td>
+                            <th
+                                className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none"
+                                onClick={() => handleSort('date')}
+                            >
+                                Data <SortIcon field="date" />
+                            </th>
+                            <th
+                                className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none"
+                                onClick={() => handleSort('activity')}
+                            >
+                                Atividade <SortIcon field="activity" />
+                            </th>
+                            <th
+                                className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none"
+                                onClick={() => handleSort('location')}
+                            >
+                                Local <SortIcon field="location" />
+                            </th>
+                            <th
+                                className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none min-w-[200px]"
+                                onClick={() => handleSort('observation')}
+                            >
+                                Observações <SortIcon field="observation" />
+                            </th>
+                            <th
+                                className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none"
+                                onClick={() => handleSort('master')}
+                            >
+                                Mestre <SortIcon field="master" />
+                            </th>
+                            <th
+                                className="p-4 cursor-pointer hover:text-amber-500 transition-colors select-none"
+                                onClick={() => handleSort('status')}
+                            >
+                                Status <SortIcon field="status" />
+                            </th>
+                            <th className="p-4">Ações</th>
                         </tr>
-                    )}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800">
+                        {sortedHistory.map((item) => (
+                            <tr key={item.id} className="hover:bg-slate-800/50">
+                                <td className="p-4">{new Date(item.date).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</td>
+                                <td className="p-4">{item.activity.name}</td>
+                                <td className="p-4">{item.location}</td>
+                                <td className="p-4 text-slate-300 max-w-[250px]">
+                                    <div className="truncate" title={item.observation || '-'}>
+                                        {item.observation || '-'}
+                                    </div>
+                                </td>
+                                <td className="p-4">{item.master.name}</td>
+                                <td className="p-4">
+                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${item.status === 'APPROVED' ? 'bg-green-500/10 text-green-400' :
+                                        item.status === 'REJECTED' ? 'bg-red-500/10 text-red-400' :
+                                            'bg-yellow-500/10 text-yellow-400'
+                                        }`}>
+                                        {item.status === 'APPROVED' ? 'Aprovado' : item.status === 'REJECTED' ? 'Rejeitado' : 'Pendente'}
+                                    </span>
+                                </td>
+                                <td className="p-4">
+                                    {item.status === 'PENDING' && (
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => setEditingItem(item)}
+                                                className="p-2 text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"
+                                                title="Editar"
+                                            >
+                                                <Pencil className="w-4 h-4" />
+                                            </button>
+                                            <form action={async () => {
+                                                const result = await resendApprovalRequest(item.id)
+                                                if (result?.error) {
+                                                    alert(result.error)
+                                                } else {
+                                                    alert('Solicitação reenviada com sucesso!')
+                                                }
+                                            }}>
+                                                <button
+                                                    type="submit"
+                                                    className="p-2 text-green-400 hover:bg-green-500/10 rounded-lg transition-colors"
+                                                    title="Reenviar Solicitação"
+                                                >
+                                                    <Mail className="w-4 h-4" />
+                                                </button>
+                                            </form>
+                                            <form action={deleteAttendance.bind(null, item.id)}>
+                                                <button
+                                                    className="p-2 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                                                    title="Excluir"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </form>
+                                        </div>
+                                    )}
+                                </td>
+                            </tr>
+                        ))}
+                        {history.length === 0 && (
+                            <tr>
+                                <td colSpan={7} className="p-8 text-center text-slate-500">Nenhum registro encontrado.</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
         </>
     )
 }
